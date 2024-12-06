@@ -1,0 +1,20 @@
++ Handle with tilda
++ Show the path in the beginning of every line (shouldn't change if there was no cmd or sethome)
++ Ability to change the homepath (value ~ automatically changes)
+(- Handle with >, >>, <, |)
+(- Handle with built-in masks)
++ Create a history (can be showed)
++ Navigating with UP, DOWN
+- Protect from multiple launch
++ Add colors
+(- Clear command)
++ Improve TAB according to frequency of the previous commands
++ Add an option to use custom shortcuts for commands made in one line
+- Add an option to divide directories into different groups, each group supports its own history and shortcuts
++ Write a help command
+- Write a command with description of main functions
+- Divide into different files
++ Create tests
++ Update Makefile
++ Update README.md
+- Checklist

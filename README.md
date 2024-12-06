@@ -1,33 +1,47 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/HejpN0Sr)
-# Project Name
+[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/N96cjnwk)
+# GoGiShell
 
-Brief project description.
+A custom-built command-line interface that provides a user-friendly environment for interacting with the
+operating system.
 
 ## Features
 
 1. [Feature 1](../../issues/1)
-   - Description
-   - Acceptance criteria
+   - Showing commands from history in-line
+   - If UP or DOWN is pressed, the input line replaces with line from history (buttons allow to navigate through commands list).
 
 2. [Feature 2](../../issues/2)
-   - Description
-   - Acceptance criteria
+   - Ability to create custom abbreviations
+   - If input is "setabbr \<value\> \<key\>", value and key are writing to a file, and in all following inputs <key> replaces with <value> before executing. <Value> might contain whitespaces.
 
 3. [Feature 3](../../issues/3)
-   - Description
-   - Acceptance criteria
+   - Autocomplete of commands according to its frequency of use
+   - If TAB is pressed, current command completes to the most used command from history starting the same way (if TAB is pressed when input is empty, it just completes to the most used command).
+
+4. [Feature 4](../../issues/4)
+   - Ability to add labels to folders, add color and local history
+   - If input is "ldir <dir-name> /[-c color/] /[-d description/]", this directory will be provided with its own history, description (shown by entering directory) and color in prompts.
+
+5. [Feature 5](../../issues/5)
+   - Ability to redirect input and output
+   - If input contains '>', '<' or '>>', it will be recognized as command to redirect input/output to the required source/destination.
+
+6. [Feature 6](../../issues/6)
+   - Ability to use pipelines
+   - If input contains '|', output of the input before pipe will be redirected to the part after it.
 
 ## Dependencies
 
 - GCC
 - Make
+- BASH
 
 ## Build Instructions
 
 1. Clone the repository:
 ```bash
-git clone 
-cd project-name
+git clone https://github.com/programming-fundamentals-class/project-2024b-ppaa23.git
+cd project-2024a-ppaa23
 ```
 
 2. Build the project:
@@ -39,9 +53,17 @@ make
 ```bash
 make test
 ```
+Be careful, testing deletes all your cache
 
 ## Usage Examples
 
 ```bash
-./program_name [arguments]
+make run
 ```
+or
+```bash
+cd build
+./GoGiShell
+```
+After launching pseudoshell you can use internal BASH command and GoGiShell commands as well.
+Here is video capture showing basic functionality and features of GoGiShell: https://www.youtube.com/watch?v=DZAADn251h0
