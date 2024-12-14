@@ -88,6 +88,11 @@ void compare_output(FILE *file) {
         "Usage: home",
         "Hello",
         "Usage: home",
+        "Hello GoGiShell",
+        "Hello GoGiShell",
+        "Hello, GoGiShell",
+        "Hello, GoGiShell",
+        "2",
         "Thank you for using GoGiShell!"
     };
 
@@ -208,6 +213,16 @@ int main() {
             "cd ..\n",
             "echo Hi\b \bello\n",
             "\033[A\033[A\033[A\033[C\n",
+            "echo Hello GoGiShell > out.txt\n",
+            "cat out.txt\n",
+            "echo Hello, GoGiShell >> out.txt\n",
+            "cat out.txt\n",
+            "grep , < out.txt\n",
+            "echo 11 > out.txt\n",
+            "echo 12 >> out.txt\n",
+            "echo 23 >> out.txt\n",
+            "grep 2 < out.txt | wc -l\n",
+            "rm out.txt\n",
             "exit\n"
         };
 

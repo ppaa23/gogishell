@@ -1,7 +1,7 @@
 #ifndef HEADERS_H
 #define HEADERS_H
 
-#include <termios.h> // For declaration of enable/diable_noncanonical_mode()
+#include <termios.h> // For declaration of enable/disable_noncanonical_mode()
 
 #define MAX_INPUT_LENGTH 4096
 #define MAX_ARGS 32
@@ -46,7 +46,7 @@ void fulfil_sorted_history_file(char *input);
 // Comparison for fulfil_sorted_history_file()
 int compare(const void *a, const void *b);
 
-// Functions handling noncanonical mode
+// Functions handling non-canonical mode
 void enable_noncanonical_mode(struct termios *original_termios);
 void disable_noncanonical_mode(struct termios *original_termios);
 
@@ -54,7 +54,6 @@ void disable_noncanonical_mode(struct termios *original_termios);
 void process_input(char *input);
 void expand_abbreviations_in_input(char *input);
 void parse_input(char *input, char *args[]);
-void execute_command(char *cmd, char *args[]);
 
 // Functions updating variables from cache files
 void get_home_dir();
@@ -80,5 +79,12 @@ void handle_tab(char *input, int *i);
 
 // Updating prompt
 void get_prompt(char *cwd, char *home_dir, char *display_cwd);
+
+// Handling redirection operators
+void handle_redirection(char *args[]);
+
+// Handling pipelines
+void parse_pipeline(char *input, char *commands[], int *num_commands);
+void execute_pipeline(char *commands[], int num_commands);
 
 #endif
