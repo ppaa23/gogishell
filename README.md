@@ -20,7 +20,7 @@ operating system.
 
 4. [Feature 4](../../issues/4)
    - Ability to add labels (consisting of a description and optionally a color) to folders
-   - If input is "ldir /<dir-name/> -d description /[-c color/]", this directory will be provided with description (shown by entering directory) and color in prompts.
+   - If input is "ldir /path/to/the/folder -d description /[-c color/]", this directory will be provided with description (shown by entering directory) and color in prompts.
 
 5. [Feature 5](../../issues/5)
    - Ability to redirect input and output
