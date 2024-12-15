@@ -33,4 +33,4 @@ build/tests/test_main.o: tests/test_main.c
 	gcc -Wall -Wextra -c tests/test_main.c -o build/tests/test_main.o
 
 clean:
-	rm -rf build ~/.gogicach
+	rm -rf build ~/.gogicache
