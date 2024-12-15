@@ -19,8 +19,8 @@ operating system.
    - If TAB is pressed, current command completes to the most used command from history starting the same way (if TAB is pressed when input is empty, it just completes to the most used command).
 
 4. [Feature 4](../../issues/4)
-   - Ability to add labels to folders, add color and local history
-   - If input is "ldir <dir-name> /[-c color/] /[-d description/]", this directory will be provided with its own history, description (shown by entering directory) and color in prompts.
+   - Ability to add labels (consisting of a description and optionally a color) to folders
+   - If input is "ldir <dir-name> -d description /[-c color/]", this directory will be provided with description (shown by entering directory) and color in prompts.
 
 5. [Feature 5](../../issues/5)
    - Ability to redirect input and output
