@@ -12,6 +12,7 @@ char home_path_file[MAX_PATH_LENGTH];
 char history_file[MAX_PATH_LENGTH];
 char abbreviation_file[MAX_PATH_LENGTH];
 char sorted_history_file[MAX_PATH_LENGTH];
+char labeled_directories_file[MAX_PATH_LENGTH];
 
 
 void initialize_paths() {
@@ -27,6 +28,7 @@ void initialize_paths() {
     snprintf(history_file, MAX_PATH_LENGTH, "%s%s", system_home_path, PRE_HISTORY_FILE);
     snprintf(abbreviation_file, MAX_PATH_LENGTH, "%s%s", system_home_path, PRE_ABBREVIATION_FILE);
     snprintf(sorted_history_file, MAX_PATH_LENGTH, "%s%s", system_home_path, PRE_SORTED_HISTORY_FILE);
+    snprintf(labeled_directories_file, MAX_PATH_LENGTH, "%s%s", system_home_path, PRE_LABELED_DIRECTORIES_FILE);
 }
 
 void create_cache() {
@@ -36,6 +38,74 @@ void create_cache() {
             perror("Failed to create .gogicache directory");
         }
     }
+}
+
+void fulfil_labeled_directories_file(char *path, char *description, char *color) {
+    FILE *file = fopen(labeled_directories_file, "r");
+    char lines[MAX_LABELED_DIRECTORIES][MAX_INPUT_LENGTH];
+    int line_count = 0;
+    int found = 0;
+
+    char new_entry[MAX_INPUT_LENGTH];
+    if (color != NULL) {
+        snprintf(new_entry, sizeof(new_entry), "%s:%s:%s\n", path, description, color);
+    } else {
+        snprintf(new_entry, sizeof(new_entry), "%s:%s\n", path, description);
+    }
+
+    if (file == NULL) {
+        // If the file doesn't exist, create it and add the new entry
+        file = fopen(labeled_directories_file, "w");
+        if (file == NULL) {
+            perror("Failed to create .labeled_directories_file");
+            return;
+        }
+        fputs(new_entry, file);
+        printf("Description and color for '%s' as '%s:%s' added.\n", path, description, color);
+        fclose(file);
+        return;
+    }
+
+    // Read all lines into memory
+    while (fgets(lines[line_count], MAX_INPUT_LENGTH, file) && line_count < MAX_LABELED_DIRECTORIES) {
+        char current_path[MAX_INPUT_LENGTH], current_description[MAX_INPUT_LENGTH], current_color[MAX_INPUT_LENGTH];
+
+        // Extract path, description, and optional color
+        if (sscanf(lines[line_count], "%[^:]:%[^:]:%s", current_path, current_description, current_color) >= 2) {
+            // If the path matches, replace the line
+            if (strcmp(current_path, path) == 0) {
+                snprintf(lines[line_count], MAX_INPUT_LENGTH, "%s", new_entry);
+                found = 1;
+                printf("Description and color for '%s' updated to '%s:%s'.\n", path, description, color);
+                cwd_changed = 1;
+            }
+        }
+        line_count++;
+    }
+    fclose(file);
+
+    // If the path was not found, add a new entry
+    if (!found) {
+        if (line_count < MAX_LABELED_DIRECTORIES) {
+            snprintf(lines[line_count++], MAX_INPUT_LENGTH, "%s", new_entry);
+            printf("Description and color for '%s' as '%s:%s' added.\n", path, description, color);
+            cwd_changed = 1;
+        } else {
+            perror("File contains too many entries");
+            return;
+        }
+    }
+
+    // Write all lines back to the file
+    file = fopen(labeled_directories_file, "w");
+    if (file == NULL) {
+        perror("Failed to open .labeled_directories_file for writing");
+        return;
+    }
+    for (int i = 0; i < line_count; i++) {
+        fputs(lines[i], file);
+    }
+    fclose(file);
 }
 
 void fulfil_home_path_file(const char *home_dir) {
@@ -314,6 +384,101 @@ void get_total_abbreviations() {
 
     fclose(file);
     total_abbreviations = line_count;
+}
+
+
+void print_directory_description(const char *path) {
+    // Resolve the absolute path using realpath
+    char abs_path[MAX_PATH_LENGTH];
+    if (realpath(path, abs_path) == NULL) {
+        perror("Failed to resolve absolute path");
+        return;
+    }
+
+    FILE *file = fopen(labeled_directories_file, "r");
+    char line[MAX_INPUT_LENGTH];
+
+    if (file == NULL) {
+        return;
+    }
+
+    // Search for the directory in the labeled file
+    while (fgets(line, sizeof(line), file) != NULL) {
+        char current_path[MAX_INPUT_LENGTH];
+        char description[MAX_INPUT_LENGTH];
+
+        // Read path and description
+        if (sscanf(line, "%[^:]:%[^\n]", current_path, description) == 2) {
+            // If the path matches the absolute path, print the description
+            if (strcmp(current_path, abs_path) == 0) {
+                printf("You are entering '%s'\n", description);
+                fclose(file);
+                return;
+            }
+        }
+    }
+    fclose(file);
+}
+
+int get_color_for_directory(const char *cwd) {
+    FILE *file = fopen(labeled_directories_file, "r");
+    if (file == NULL) {
+        return -1;  // Return -1 if the file can't be opened
+    }
+
+    char line[MAX_PATH_LENGTH];
+    while (fgets(line, sizeof(line), file)) {
+        // Trim newline character from the line if present
+        line[strcspn(line, "\n")] = '\0';
+
+        // Split the line into path, color name, and any extra parts
+        char *path = strtok(line, ":");
+        strtok(NULL, ":");  // Skip the second part (irrelevant for now)
+        char *color_name = strtok(NULL, ":");  // Get the third part as the color name
+
+        // Check if the current working directory starts with this path
+        if (strncmp(cwd, path, strlen(path)) == 0) {
+            fclose(file);
+            return color_name_to_code(color_name);  // Return the corresponding color code
+        }
+    }
+
+    fclose(file);
+    return -1;  // Return -1 if no color was found
+}
+
+// Function to convert a color name to an ANSI escape code
+int color_name_to_code(const char *color_name) {
+    if (strcmp(color_name, "black") == 0) return 30;
+    if (strcmp(color_name, "red") == 0) return 31;
+    if (strcmp(color_name, "green") == 0) return 32;
+    if (strcmp(color_name, "yellow") == 0) return 33;
+    if (strcmp(color_name, "blue") == 0) return 34;
+    if (strcmp(color_name, "magenta") == 0) return 35;
+    if (strcmp(color_name, "cyan") == 0) return 36;
+    if (strcmp(color_name, "white") == 0) return 37;
+
+    // Light colors
+    if (strcmp(color_name, "light_black") == 0) return 90;
+    if (strcmp(color_name, "light_red") == 0) return 91;
+    if (strcmp(color_name, "light_green") == 0) return 92;
+    if (strcmp(color_name, "light_yellow") == 0) return 93;
+    if (strcmp(color_name, "light_blue") == 0) return 94;
+    if (strcmp(color_name, "light_magenta") == 0) return 95;
+    if (strcmp(color_name, "light_cyan") == 0) return 96;
+    if (strcmp(color_name, "light_white") == 0) return 97;
+
+    // Background colors
+    if (strcmp(color_name, "bg_black") == 0) return 40;
+    if (strcmp(color_name, "bg_red") == 0) return 41;
+    if (strcmp(color_name, "bg_green") == 0) return 42;
+    if (strcmp(color_name, "bg_yellow") == 0) return 43;
+    if (strcmp(color_name, "bg_blue") == 0) return 44;
+    if (strcmp(color_name, "bg_magenta") == 0) return 45;
+    if (strcmp(color_name, "bg_cyan") == 0) return 46;
+    if (strcmp(color_name, "bg_white") == 0) return 47;
+
+    return -1; // Inappropriate color name
 }
 
 char* get_command_from_history(int command_index) {
