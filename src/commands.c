@@ -7,6 +7,69 @@
 #include "headers.h"
 
 
+void ldir(char *args[]) {
+    if (args[1] == NULL) {
+        printf("Usage: ldir <path> -d <description> [-c <color>]\n");
+        return;
+    }
+
+    char *path = NULL;
+    char description[MAX_INPUT_LENGTH] = "";
+    char *color = NULL;
+
+    int i = 1; // Start parsing arguments from the first argument after "ldir"
+    while (args[i] != NULL) {
+        if (strcmp(args[i], "-d") == 0) {
+            // Handle the description flag
+            if (args[i + 1] == NULL) {
+                printf("Usage: ldir <path> -d <description> [-c <color>]\n");
+                return;
+            }
+            i++;
+            // Concatenate all words in the description until another flag or end of input
+            while (args[i] != NULL && args[i][0] != '-') {
+                strcat(description, args[i]);
+                strcat(description, " ");
+                i++;
+            }
+            description[strlen(description) - 1] = '\0'; // Remove trailing space
+            i--; // Adjust index to stay consistent
+        } else if (strcmp(args[i], "-c") == 0) {
+            // Handle the color flag
+            if (args[i + 1] == NULL) {
+                printf("Usage: ldir <path> -d <description> [-c <color>]\n");
+                return;
+            }
+            color = args[i + 1];
+            i++;
+        } else if (path == NULL) {
+            // The first non-flag argument is treated as the path
+            path = args[i];
+        } else {
+            // Any unexpected argument is an error
+            printf("Usage: ldir <path> -d <description> [-c <color>]\n");
+            return;
+        }
+        i++;
+    }
+
+    // Validate required arguments
+    if (path == NULL || strlen(description) == 0) {
+        printf("Usage: ldir <path> -d <description> [-c <color>]\n");
+        return;
+    }
+
+    // Convert the path to an absolute path
+    char absolute_path[MAX_PATH_LENGTH];
+    if (realpath(path, absolute_path) == NULL) {
+        printf("Usage: ldir <path> -d <description> [-c <color>]\n");
+        return;
+    }
+
+    // Call fulfil_labeled_directories_file to handle file operations
+    fulfil_labeled_directories_file(absolute_path, description, color);
+}
+
 void sethome(char *args[]) {
     if (args[1] == NULL || args[2] != NULL) {
         printf("Usage: sethome <path>\n\tsethome .\n\tsethome ..\n\tsethome default\n");
@@ -232,6 +295,8 @@ void help(char *args[]) {
         printf("history - print the whole GoGiShell history of commands without arguments, or:\n");
         printf("        clear - clear the GoGiShell history\n");
         printf("        <number> - print <number> last commands\n");
+        printf("\n");
+        printf("ldir <path> -d <description> [-c <color>] - add to the directory description showing when directory is entering and color of prompt if user is in this directory (color should be a standard name corresponding to some ASCII color code\n");
         printf("\n");
         printf("help - print manual\n");
         printf("\n");
