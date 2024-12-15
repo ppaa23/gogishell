@@ -12,12 +12,15 @@
 #define MAX_ABBREVIATIONS 64
 #define MAX_KEY_LENGTH 16
 #define MAX_VALUE_LENGTH 64
+#define MAX_LABELED_DIRECTORIES 32
+#define MAX_COLOR_NAME_LENGTH 16
 
 #define PRE_CACHE_DIR "/.gogicache"
 #define PRE_HOME_PATH_FILE "/.gogicache/.home_path"
 #define PRE_HISTORY_FILE "/.gogicache/.history"
 #define PRE_ABBREVIATION_FILE "/.gogicache/.abbreviation"
 #define PRE_SORTED_HISTORY_FILE "/.gogicache/.sorted_history"
+#define PRE_LABELED_DIRECTORIES_FILE "/.gogicache/.labeled_directories"
 
 struct Command {
     const char *command;
@@ -28,12 +31,14 @@ extern char home_dir[MAX_PATH_LENGTH];
 extern int cwd_changed;
 extern int total_commands;
 extern int total_abbreviations;
+extern int total_labeled_directories;
 
 extern char cache_dir[MAX_PATH_LENGTH];
 extern char home_path_file[MAX_PATH_LENGTH];
 extern char history_file[MAX_PATH_LENGTH];
 extern char abbreviation_file[MAX_PATH_LENGTH];
 extern char sorted_history_file[MAX_PATH_LENGTH];
+extern char labeled_directories_file[MAX_PATH_LENGTH];
 
 // Functions updating cache files from variables
 void initialize_paths();
@@ -42,6 +47,7 @@ void fulfil_home_path_file(const char *home_dir);
 void fulfil_history_file(char *input);
 void fulfil_abbreviation_file(char *value, char *key);
 void fulfil_sorted_history_file(char *input);
+void fulfil_labeled_directories_file(char *path, char *description, char *color);
 
 // Comparison for fulfil_sorted_history_file()
 int compare(const void *a, const void *b);
@@ -66,6 +72,7 @@ void history(char *args[]);
 void home(char *args[]);
 void setabbr(char *args[]);
 void abbr(char *args[]);
+void ldir(char *args[]);
 void help(char *args[]);
 
 // Functions completing input
@@ -79,6 +86,12 @@ void handle_tab(char *input, int *i);
 
 // Updating prompt
 void get_prompt(char *cwd, char *home_dir, char *display_cwd);
+
+// Printing the description of entering directory if labeled
+void print_directory_description(const char *path);
+
+int get_color_for_directory(const char *cwd);
+int color_name_to_code(const char *color_name);
 
 // Handling redirection operators
 void handle_redirection(char *args[]);
