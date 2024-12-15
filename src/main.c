@@ -116,7 +116,8 @@ void process_input(char *input) {
             {"home", home},
             {"setabbr", setabbr},
             {"abbr", abbr},
-            {"help", help}
+            {"help", help},
+            {"ldir", ldir}
         };
 
         if (args[0] == NULL) {
@@ -140,6 +141,8 @@ void process_input(char *input) {
                 chdir(home_dir);
                 cwd_changed = 1;
             } else {
+                print_directory_description(args[1]);
+
                 if (chdir(args[1]) == -1) {
                     perror("BASH command cd failed");
                 } else {
@@ -268,7 +271,6 @@ void handle_up_arrow(char *input, int *command_index, int *i) {
             printf("\b \b");
             (*i)--;
         }
-
         (*command_index)--;
         char *command = get_command_from_history(*command_index);
 
@@ -286,7 +288,6 @@ void handle_down_arrow(char *input, int *command_index, int *i) {
             printf("\b \b");
             (*i)--;
         }
-
         (*command_index)++;
         char *command = get_command_from_history(*command_index);
 
@@ -323,11 +324,21 @@ void handle_tab(char *input, int *i) {
 }
 
 void get_prompt(char *cwd, char *home_dir, char *display_cwd) {
+    // If the current directory is inside the home directory, shorten it with '~'
     if (strncmp(cwd, home_dir, strlen(home_dir)) == 0) {
         snprintf(display_cwd, MAX_PATH_LENGTH, "~%s", cwd + strlen(home_dir));
     } else {
         strncpy(display_cwd, cwd, MAX_PATH_LENGTH);
         display_cwd[MAX_PATH_LENGTH - 1] = '\0';
+    }
+
+    // Get color for the current directory
+    int color_code = get_color_for_directory(cwd);
+    if (color_code != -1) {
+        // Apply color if a valid color code is returned
+        char colored_prompt[MAX_PATH_LENGTH];
+        snprintf(colored_prompt, MAX_PATH_LENGTH, "\033[%dm%s\033[0m", color_code, display_cwd);
+        strncpy(display_cwd, colored_prompt, MAX_PATH_LENGTH);
     }
 }
 
