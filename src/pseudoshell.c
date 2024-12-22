@@ -35,7 +35,7 @@ void create_cache() {
     struct stat st;
     if (stat(cache_dir, &st) == -1) {
         if (mkdir(cache_dir, 0700) == -1) {
-            perror("Failed to create .gogicache directory");
+            perror("Failed to create .gogicache directory in your home directory.");
         }
     }
 }

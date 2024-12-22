@@ -14,7 +14,7 @@ int total_abbreviations = 0;
 
 
 void expand_abbreviations_in_input(char *input) {
-    char expanded[MAX_INPUT_LENGTH] = {0};
+    char expanded[MAX_INPUT_LENGTH] = {0}; // Buffer to store the expanded input
     char key[MAX_KEY_LENGTH];
     char value[MAX_VALUE_LENGTH];
     int i = 0, j = 0;
@@ -41,23 +41,22 @@ void expand_abbreviations_in_input(char *input) {
             value[strcspn(value, "\n")] = '\0';
 
             // Process input to expand the abbreviation
-            i = 0; j = 0; // Reset indices for processing
+            i = 0;
+            j = 0;
             while (input[i] != '\0' && j < MAX_INPUT_LENGTH - 1) {
                 if (strncmp(&input[i], key, strlen(key)) == 0) {
                     // Match found; check if the expanded output can fit
                     int value_len = strlen(value);
                     if (j + value_len < MAX_INPUT_LENGTH - 1) {
                         strcpy(&expanded[j], value);
-                        j += value_len;    // Move the output index
-                        i += strlen(key);  // Move the input index past the key
+                        j += value_len;
+                        i += strlen(key);
                     } else {
-                        // Truncate and safely null-terminate if value is too long
                         perror("Expanded value exceeds maximum input length");
                         expanded[MAX_INPUT_LENGTH - 1] = '\0';
                         break;
                     }
                 } else {
-                    // No match; copy the current character if space permits
                     if (j < MAX_INPUT_LENGTH - 1) {
                         expanded[j++] = input[i++];
                     } else {
@@ -68,16 +67,19 @@ void expand_abbreviations_in_input(char *input) {
                 }
             }
 
-            // Null-terminate the expanded string
             expanded[j] = '\0';
 
-            // Copy expanded result back into input for further abbreviation checks
             strncpy(input, expanded, MAX_INPUT_LENGTH - 1);
-            input[MAX_INPUT_LENGTH - 1] = '\0'; // Ensure null-termination
+            input[MAX_INPUT_LENGTH - 1] = '\0';
         }
     }
 
-    fclose(file); // Close the file
+    // Check for read errors
+    if (ferror(file)) {
+        perror("Error reading abbreviation file");
+    }
+
+    fclose(file);
 }
 
 void parse_input(char *input, char *args[]) {
