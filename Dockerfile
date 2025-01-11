@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
     pty-process \
     && rm -rf /var/lib/apt/lists/*
 
-RUN git clone https://github.com/programming-fundamentals-class/project-2024a-ppaa23.git /app
+RUN git clone https://github.com/programming-fundamentals-class/project-2024b-ppaa23.git /app
 
 WORKDIR /app
 
