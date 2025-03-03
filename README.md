@@ -40,8 +40,8 @@ operating system.
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/programming-fundamentals-class/project-2024b-ppaa23.git
-cd project-2024a-ppaa23
+git clone https://github.com/ppaa23/gogishell.git
+cd gogishell
 ```
 
 2. Build the project:
